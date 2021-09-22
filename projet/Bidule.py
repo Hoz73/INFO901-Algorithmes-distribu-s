@@ -1,20 +1,10 @@
-class Message():
-    def __init__(self, titre, source, destination, paylode):
-        self.source = source
-        self.destination = destination
+from abc import ABC, abstractmethod
+
+class Message(ABC):
+    def __init__(self, paylode):
         self.paylode = paylode
-        self.titre = titre
         self.estamp = None
 
-    def getTitre(self):
-        return self.titre
-
-    def getSource(self):
-        return self.source
-    
-    def getDestination(self):
-        return self.destination
-    
     def getPaylode(self):
         return self.paylode
 
@@ -24,11 +14,42 @@ class Message():
     def getEstamp(self):
         return self.estamp
     
+
+class MessageAsynchronize(Message):
+    def __init__(self, source, destination, paylode):
+        super().__init__(paylode)
+        self.source = source
+        self.destination = destination
+    
+    def getSource(self):
+        return self.source
+    
+    def getDestination(self):
+        return self.destination
+
+    def setDestination(self,dest):
+        self.destination = dest
+    
+    def setSource(self,source):
+        self.source = source
+
+class Token():
+    def __init__(self, destination):
+        self.destination = destination
+    
+    def getDestination(self):
+        return self.destination
+
     def setDestination(self,dest):
         self.destination = dest
 
-class Token(Message):
-    pass
-
 class MessageSynchronize(Message):
-    pass
+    def __init__(self, source, paylode):
+        self.source = source
+        self.paylode = paylode
+
+    def getSource(self):
+        return self.source
+
+    def getPaylode(self):
+        return self.paylode

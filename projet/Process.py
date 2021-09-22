@@ -7,7 +7,7 @@ from time import sleep
 #from geeteventbus.event import event
 
 #from EventBus import EventBus
-from Bidule import Message, Token, BrodcastMessage, MessageSynchronize
+from Bidule import Message, Token, MessageSynchronize, MessageAsynchronize
 from Classes import Com
 
 from pyeventbus3.pyeventbus3 import *
@@ -16,14 +16,11 @@ class Process(Thread):
     
     def __init__(self,name):
         Thread.__init__(self)
-        self.horloge = 0
         self.setName(name)
         self.comm = Com(self.getName())
 
-        self.statue= None
-        PyBus.Instance().register(self, self)
-        if self.getName == "P2" :
-            self.comm.createToken()
+        #if self.getName() == "P2" :
+        #    self.comm.createToken()
         
         self.alive = True
         self.start()
@@ -36,46 +33,53 @@ class Process(Thread):
             print(self.getName() + " Loop: " + str(loop))
             sleep(1)
 
-            if self.getName() == "P1":
-                m1 = Message("test pour dire bonjour", "P1", "rémi", "coucou toi")
-                m2 = Message("test2", "P1", "Momo", "hello toi")
-                print(self.getName() + " send: " + m1.getTitre())
+            # if self.getName() == "P0":
+            #     m1 = MessageAsynchronize(self.getName(),"P2","ceci est un test de brodcast")
+            #     print(self.getName() + " send à : " + m1.getDestination())
+                #self.comm.brodcast(m1)
+                #self.comm.sendTo(m1,"P2")
                 ############################# on synchronize ################
             
-            if loop == 0 and self.getName()=="P0":
-                print('uiii')
-                loop = 9
-            if loop == 0 and self.getName()=="P1":
-                print('uiiiiiiiii')
-                loop = 5
-            if loop == 10:
-                self.synchronize()
+            # if loop == 0 and self.getName()=="P0":
+            #     loop = 8
+            # if loop == 0 and self.getName()=="P1":
+            #     loop = 5
+            # if loop == 10:
+            #     self.comm.synchronize()
                 ############################# on brodcast####################
                 #self.brodcast(m1)
                 ############################## on send ######################
                 #self.sendTo(m1,"P2")
             ##################################### on Token ##################
-            # if self.getName() == 'P0' and loop==0:
-            #     t = Token("P1")
-            #     #token = t.genereteToken()
-            #     self.sendToToken(t)
 
             # if loop == 2:
             #     if self.getName() == "P1":
-            #         self.request()
+            #         self.comm.requestSC()
             #         sleep(1)
             #         print("je dois passer dans release")
-            #         self.release()
+            #         self.comm.releaseSC()
             #         print(" je suis release normalement")
             
             # if loop == 5:
             #     if self.getName() == "P2":
-            #         self.request()
+            #         self.comm.requestSC()
             #         sleep(3)
             #         print("je dois passer dans release")
-            #         self.release()
+            #         self.comm.releaseSC()
             #         print(" je suis release normalement")
-            ############################# on synchronize #######################
+
+            ############################# broadcastSyncéline #######################
+            # if loop == 2 :
+            #     m= MessageAsynchronize("P1","brodcast","uiiii")
+            #     self.comm.broadcastSync("P1",m)
+            
+            ############################# send et recv sync #######################
+            m= MessageAsynchronize("P1","P0","uiiii")
+            if loop == 5 and self.getName() == "P1" :
+                self.comm.sendToSync(m.getDestination(),m)
+            if loop == 2 and  self.getName() == "P0" :
+                self.comm.recvFromSync(m.getSource(),m)
+
             
             loop+=1
         print(self.getName() + " stopped")
