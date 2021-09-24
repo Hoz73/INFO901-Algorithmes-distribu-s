@@ -28,6 +28,10 @@ class Process(Thread):
 
     #Méthode à conserver
     def run(self):
+        sleep(3)
+        idP = self.comm.getId()
+        print(self.getName() + ", id : "+str(idP))
+
         loop = 0
         while self.alive:
             print(self.getName() + " Loop: " + str(loop))
@@ -46,7 +50,7 @@ class Process(Thread):
             #     loop = 5
             # if loop == 10:
             #     self.comm.synchronize()
-                ############################# on brodcast####################
+                ############################# on brodcast ####################
                 #self.brodcast(m1)
                 ############################## on send ######################
                 #self.sendTo(m1,"P2")
@@ -68,18 +72,17 @@ class Process(Thread):
             #         self.comm.releaseSC()
             #         print(" je suis release normalement")
 
-            ############################# broadcastSyncéline #######################
+            ############################# broadcast Synchronized #######################
             # if loop == 2 :
             #     m= MessageAsynchronize("P1","brodcast","uiiii")
             #     self.comm.broadcastSync("P1",m)
             
             ############################# send et recv sync #######################
-            m= MessageAsynchronize("P1","P0","uiiii")
-            if loop == 5 and self.getName() == "P1" :
-                self.comm.sendToSync(m.getDestination(),m)
-            if loop == 2 and  self.getName() == "P0" :
-                self.comm.recvFromSync(m.getSource(),m)
-
+            # m= MessageAsynchronize("P1","P0","uiiii")
+            # if loop == 5 and self.getName() == "P1" :
+            #     self.comm.sendToSync(m.getDestination(),m)
+            # if loop == 2 and  self.getName() == "P0" :
+            #     self.comm.recvFromSync(m.getSource(),m)
             
             loop+=1
         print(self.getName() + " stopped")

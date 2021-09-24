@@ -1,7 +1,8 @@
 import queue
 from pyeventbus3.pyeventbus3 import *
 from time import sleep
-from Bidule import Message, Token, MessageSynchronize, MessageAsynchronize
+from Bidule import Message, Token, MessageSynchronize, MessageAsynchronize, MessageSystem
+from random import randint
 
 class Com():
     def __init__(self, pName):
@@ -11,7 +12,9 @@ class Com():
         self.pName = pName
         self.queue = queue.Queue()
         self.countSyn = 0
-        self.nbProc = 3
+        self.nbProc = 0
+        self.id = randint(0, 1000000)
+        self.numProcess = None
         PyBus.Instance().register(self, self)
 
     def setHorloge(self,horloge):
@@ -47,13 +50,20 @@ class Com():
         message.setEstamp(self.horloge)
         PyBus.Instance().post(message)
 
+    def brodcastSystem(self,message):
+        PyBus.Instance().post(message)
+
     @subscribe(threadMode = Mode.PARALLEL, onEvent=MessageAsynchronize)
     def OnReceive(self,event):
         if self.getPName() != event.getSource():
             if(event.getDestination() == "brodcast" or self.getPName() == event.getDestination()):
                 self.modifyHorlogeOnEvent(event)
                 self.appendBOL(event)
-                #print("je suis "+ self.getPName() + ", BOL :"+str(self.getBOL().getSource()))
+
+    @subscribe(threadMode = Mode.PARALLEL, onEvent=MessageSystem)
+    def OnReceive(self,event):
+        if (self.getPName() != event.getSource()):
+                self.appendBOL(event)
     
     @subscribe(threadMode = Mode.PARALLEL, onEvent=Token)
     def onToken(self,event):
@@ -159,3 +169,28 @@ class Com():
                 message.setSource(self.getPName())
                 self.sendTo(message,source)
                 print(self.getPName() + " recois + débloqué")
+
+    def initId(self):
+        m = MessageSystem(self.getPName(),self.id)
+        self.brodcastSystem(m)
+
+    def choseId(self):
+        self.nbProc = self.sizeBOL()+1
+        tab= list()
+        while self.sizeBOL() != 0:
+            tab.append(self.getBOL().getPaylode())
+        tab.append(self.id)
+        tab.sort()    
+        print(tab)
+        self.numProcess = tab.index(self.id)
+        print("mon id : "+str(self.id)+ ", index :" + str(tab.index(self.id)))
+        return self.numProcess 
+        
+
+    def getId(self):
+        if self.numProcess == None:
+            self.initId()
+            sleep(3)
+            return self.choseId()
+        else:
+            return self.numProcess

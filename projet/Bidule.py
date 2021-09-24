@@ -53,3 +53,14 @@ class MessageSynchronize(Message):
 
     def getPaylode(self):
         return self.paylode
+
+class MessageSystem(Message):
+    def __init__(self, source, paylode):
+        super().__init__(paylode)
+        self.source = source
+    
+    def getSource(self):
+        return self.source
+    
+    def setSource(self,source):
+        self.source = source
